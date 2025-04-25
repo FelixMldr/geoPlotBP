@@ -3,21 +3,31 @@ import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 from scipy.stats import binom
 
+#Constants/Parameters
+ETA = 2
+ETA2 = 3
+
+
 # Parameters for the two binomial distributions
-n1, p1 = 10, 0.5  # X-axis binomial
-n2, p2 = 10, 0.5  # Y-axis binomial
+n1, p1 = 4, 0.5  # X-axis binomial
+n2, p2 = 4, 0.5  # Y-axis binomial
+
+B = 5 # Number of different b 
+
+bo = n1/2
 
 # Generate points along the x and y axes
 x = np.arange(0, n1 + 1)
-y = np.arange(0, n2 + 1)
+y = np.arange(0, n1 + 1)
 X, Y = np.meshgrid(x,y)
 
-xlat = np.arange(-5,5+1)
-xlon = np.arange(-5,5+1)
+xlat = np.arange(-bo,bo+1)
+xlon = np.arange(-bo, bo+1)
 
 # Compute probability values along the axes
 prob_x = binom.pmf(X,n1,p1)
 prob_y = binom.pmf(Y,n2,p2)
+#prob_b = binom.pmf(B, )
 
 #joint probability
 joint_pmf = prob_x * prob_y
@@ -40,6 +50,7 @@ eqcs = [2, 2]
 
 dist = [0.125,0.25,0.5,0.25,0.125]
 
+
 rhs = sum(vi*wi for vi,wi in zip(eqcs,sec)) 
 
 eqs = []
@@ -56,7 +67,7 @@ for (a,b) in zip(eqs,dist):
     
 plt.plot(sec[0],sec[1], 'bo', markersize=5, label="Sec")
 
-heatmap = plt.imshow(joint_pmf, extent=(-5, 5, -5, 5), origin='lower', cmap='viridis', aspect='auto', alpha=0.7)
+heatmap = plt.imshow(joint_pmf, extent=(-bo, bo, -bo, bo), origin='lower', cmap='viridis', aspect='auto', alpha=0.7)
 
 plt.colorbar(heatmap, label='Probability')
 
@@ -69,7 +80,7 @@ plt.colorbar(heatmap, label='Probability')
 #    ax.plot(0, y[i],'o', color=cmap(norm_y[i]), markersize=10)
 
 def ploting(distx1, distx2, hint):
-    
+    #distx1 = [-nu, ..., nu]
     return 0
 
 # Set limits and aspect
@@ -81,8 +92,8 @@ def ploting(distx1, distx2, hint):
 plt.title(f'BP initial joint binomial dist')
 plt.xlabel('x1')
 plt.ylabel('x2')
-plt.xticks(np.arange(-5, 5 + 1))
-plt.yticks(np.arange(-5, 5 + 1))
+plt.xticks(np.arange(-bo, bo + 1))
+plt.yticks(np.arange(-bo, bo + 1))
 plt.grid(True, linestyle='--', alpha=0.3)
 plt.savefig('my_plot.png', dpi=300, bbox_inches='tight')
 plt.show()
