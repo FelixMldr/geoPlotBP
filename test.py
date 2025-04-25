@@ -3,49 +3,46 @@ import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 from scipy.stats import binom
 
-# Binomial distribution parameters
-n = 5     # number of trials
-p = 0.5     # probability of success
+# Central binomial distribution: n = 2k, p = 0.5
+k = 2
+n = 2 * k
+p = 0.5
 
-# x and y values representing number of successes (discrete)
-x = np.arange(0, n + 1)
-y = np.arange(0, n + 1)
+# Discrete values from 0 to n
+values = np.arange(0, n + 1)
 
-# Binomial PMF along x and y axes
-prob_x = binom.pmf(x, n, p)
-prob_y = binom.pmf(y, n, p)
+# PMF values
+pmf = binom.pmf(values, n, p)
 
-# Normalize for colormap
-norm_x = prob_x / np.max(prob_x)
-norm_y = prob_y / np.max(prob_y)
+# Normalize for coloring
+norm_pmf = pmf / np.max(pmf)
+cmap = cm.magma
 
-# Choose colormap
-cmap = cm.plasma
-
-# Plotting
+# Create the plot
 fig, ax = plt.subplots(figsize=(8, 6))
 
-# Plot colored x-axis points
-for i in range(len(x)):
-    ax.plot(x[i], 0, 'o', color=cmap(norm_x[i]), markersize=10)
+# Plot x-axis colored points
+for i, val in enumerate(values):
+    ax.plot(val, 0, 'o', color=cmap(norm_pmf[i]), markersize=7)
 
-# Plot colored y-axis points
-for i in range(len(y)):
-    ax.plot(0, y[i], 'o', color=cmap(norm_y[i]), markersize=10)
+# Plot y-axis colored points
+for i, val in enumerate(values):
+    ax.plot(0, val, 'o', color=cmap(norm_pmf[i]), markersize=7)
 
-# Draw zero axis lines
-ax.axhline(0, color='gray', linewidth=1, linestyle='--')
-ax.axvline(0, color='gray', linewidth=1, linestyle='--')
-
-# Set limits
+# Formatting
 ax.set_xlim(-1, n + 1)
 ax.set_ylim(-1, n + 1)
 ax.set_aspect('equal')
+ax.set_xlabel('x')
+ax.set_ylabel('y')
+ax.set_title(f'Central Binomial Distribution Coloring (n={n}, p={p})')
+ax.axhline(0, color='gray', linestyle='--', linewidth=1)
+ax.axvline(0, color='gray', linestyle='--', linewidth=1)
+ax.grid(True, linestyle='--', alpha=0.3)
 
-# Labels and title
-ax.set_title(f'Binomial Distribution Coloring on Axes (n={n}, p={p})')
-ax.set_xlabel('x (number of successes)')
-ax.set_ylabel('y (number of successes)')
+# Add colorbar
+sm = plt.cm.ScalarMappable(cmap=cmap, norm=plt.Normalize(vmin=0, vmax=np.max(pmf)))
+sm.set_array([])
+plt.colorbar(sm, ax=ax, label='Probability Mass')
 
-plt.grid(True, linestyle='--', alpha=0.3)
 plt.show()
