@@ -6,95 +6,70 @@ from scipy.stats import binom
 #Constants/Parameters
 ETA = 2
 ETA2 = 3
+PINIT = 0.5
+RSZ = 2*ETA + 1 #Range size {-2,..,2} => 5    
 
-
-# Parameters for the two binomial distributions
-n1, p1 = 4, 0.5  # X-axis binomial
-n2, p2 = 4, 0.5  # Y-axis binomial
-
-B = 5 # Number of different b 
-
-bo = n1/2
-
-# Generate points along the x and y axes
-x = np.arange(0, n1 + 1)
-y = np.arange(0, n1 + 1)
-X, Y = np.meshgrid(x,y)
-
-xlat = np.arange(-bo,bo+1)
-xlon = np.arange(-bo, bo+1)
-
-# Compute probability values along the axes
-prob_x = binom.pmf(X,n1,p1)
-prob_y = binom.pmf(Y,n2,p2)
-#prob_b = binom.pmf(B, )
-
-#joint probability
-joint_pmf = prob_x * prob_y
-
-# Normalize probabilities for colormap
-#norm_x = prob_x / np.max(prob_x)
-#norm_y = prob_y / np.max(prob_y)
-
-# Choose a colormap
-cmap = cm.viridis
-
-#Set up the x axis
-#x = np.linspace(-4, 4, 500)
-
-#secret from {-eta, ..., eta}
-sec = [1, -1]
-
-#eq_coeffs from {-eta2, ..., eta2}
-eqcs = [2, 2]
-
-dist = [0.125,0.25,0.5,0.25,0.125]
-
-
-rhs = sum(vi*wi for vi,wi in zip(eqcs,sec)) 
-
-eqs = []
-for b in range(rhs-2,rhs+3):
-    eqs.append(((b+n1)/eqcs[1]) - (eqcs[0]/eqcs[1])*x)
-
-
-# Plot
-#fig, ax = plt.subplots(figsize=(8, 8))
-
-
-for (a,b) in zip(eqs,dist):
-    plt.plot(xlat,a,color='red', alpha=b)
+def ploting(distx1, distx2, hint, sec):
+    #distx1 = [-ETA,...,ETA]
+    #distx2 = [-ETA,...,ETA]
+    #hint = 2d-equation ([INT],[(INT,float)])
+    #sec = 2d-point [s1,s2]
     
-plt.plot(sec[0],sec[1], 'bo', markersize=5, label="Sec")
+    joint_pmf = np.outer(distx1, distx2)
 
-heatmap = plt.imshow(joint_pmf, extent=(-bo, bo, -bo, bo), origin='lower', cmap='viridis', aspect='auto', alpha=0.7)
+    #For one hint plot the lines for different b with their prob.
+    xlat = np.linspace(-ETA,ETA)
+    (s,t) = hint
+    mar = 0
+    for i in t:
+        a = (i[0]/s[1]) - (s[0]/s[1])*xlat
+        plt.plot(xlat,a,color='red', alpha=i[1])
+        for z in a:
+            u = np.abs(z)
+            if mar < u:
+                mar = u
+    
+    #plot heatmap (aspect=equal?, interpolation?)
+    heatmap = plt.imshow(joint_pmf, extent=(-mar, mar, -mar, mar), origin='lower', cmap='viridis', aspect='auto',interpolation='bilinear', alpha=0.7)
+    
+    # plot secret
+    plt.plot(sec[0],sec[1],'bo', markersize=5, label="sec")
+    
+    #plot heatmap bar
+    plt.colorbar(heatmap, label='Probability')
+    # Add grid and labels
+    plt.title(f'Geometric depiction of dist. hint solver')
+    plt.xlabel('x1')
+    plt.ylabel('x2')
+    plt.xticks(np.arange(-mar, mar+1))
+    plt.yticks(np.arange(-mar, mar+1))
+    plt.grid(True, linestyle='--', alpha=0.5)
+    return plt
 
-plt.colorbar(heatmap, label='Probability')
+def main():
+    #Create distx1
+    #x = np.arange(0,RSZ)
+    #distx1 = binom.pmf(x,RSZ,PINIT)
+    distx1 = [0.0625,0.25,0.375,0.25,0.0625]
+    #Create distx2
+    #y = np.arange(0,RSZ)
+    #distx2 = binom.pmf(y,RSZ,PINIT)
+    distx2 = [0.0625,0.25,0.375,0.25,0.0625]
+    #Create sec
+    sec = [1,-1]
+    #Create hint
+    eq = [2,2]
+    #Compute b
+    b = sum(vi*wi for vi,wi in zip(eq,sec))
+    #Create hintDist
+    hintDist = [(b,0.4),(b-1,0.3),(b-2,0.2),(b+1,0.1)] 
+    #Create hint
+    hint = (eq,hintDist)
+    #Plot graph and save it
+    plots = ploting(distx1,distx2,hint,sec)
+    plots.savefig('GeoAppBPsolver.png', dpi=300, bbox_inches='tight')
+    plots.show()
 
-# Plot the x-axis with color
-#for i in range(len(x) - 1):
-#    ax.plot(x[i], 0,'o', color=cmap(norm_x[i]), markersize=10)
 
-# Plot the y-axis with color
-#for i in range(len(y) - 1):
-#    ax.plot(0, y[i],'o', color=cmap(norm_y[i]), markersize=10)
-
-def ploting(distx1, distx2, hint):
-    #distx1 = [-nu, ..., nu]
-    return 0
-
-# Set limits and aspect
-#ax.set_xlim(-4, 4)
-#ax.set_ylim(-4, 4)
-#ax.set_aspect('equal')
-
-# Add grid and labels
-plt.title(f'BP initial joint binomial dist')
-plt.xlabel('x1')
-plt.ylabel('x2')
-plt.xticks(np.arange(-bo, bo + 1))
-plt.yticks(np.arange(-bo, bo + 1))
-plt.grid(True, linestyle='--', alpha=0.3)
-plt.savefig('my_plot.png', dpi=300, bbox_inches='tight')
-plt.show()
-
+if __name__ == "__main__":
+    main()
