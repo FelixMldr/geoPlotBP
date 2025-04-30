@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 from scipy.stats import binom
+from functools import reduce
 
 # Constants/Parameters
 ETA = 2
@@ -94,7 +95,11 @@ def main():
     hint = (eq, hintDist)
 
     # Compute convolution S1 = x2 + x3 (generic?)
-    s1 = convolution(distx2, distx3)
+    # s1 = convolution(distx2, distx3)
+
+    # Compute convolutions of arbitrary many distributions
+    dists = [distx1, distx2, distx3]
+    s1 = reduce(convolution, dists)
 
     # Plot graph and save it
     plots = ploting(distx1, s1, hint, sec)
