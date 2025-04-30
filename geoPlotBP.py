@@ -54,7 +54,7 @@ def ploting(distx1, dists1, hint, sec):
     # Add grid and labels
     plt.title(f'Geometric depiction of dist. hint solver')
     plt.xlabel('x1')
-    plt.ylabel('S1')
+    plt.ylabel('s1')
     plt.xticks(np.arange(-mar, mar+1))
     plt.yticks(np.arange(-mar, mar+1))
     plt.grid(True, linestyle='--', alpha=0.5)
