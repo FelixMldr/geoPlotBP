@@ -25,7 +25,9 @@ def ploting(distx1, dists1, hint, sec):
     (s, t) = hint
     mar = 0
     for i in t:
-        a = (i[0]/s[1]) - (s[0]/s[1])*xlat
+        # a = (i[0]/s[1]) - (s[0]/s[1])*xlat
+        # New due to projection
+        a = i[0] - s[0]*xlat
         plt.plot(xlat, a, color='red', alpha=i[1])
         # Compute the length of the axes of the plot
         for z in a:
