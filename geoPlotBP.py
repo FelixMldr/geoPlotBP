@@ -13,7 +13,7 @@ RSZ = 2*ETA + 1  # Range size {-2,..,2} => 5
 
 def ploting(distx1, dists1, hint, sec):
     # distx1 = [-ETA,...,ETA]
-    # distx2 = [-ETA,...,ETA]
+    # dists1 = [-ETA,...,ETA]
     # hint = nd-equation ([INT],[(INT,float)])
     # sec = nd-point [s1,s2, ... ,sn]
 
