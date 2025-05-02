@@ -1,7 +1,5 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import matplotlib.cm as cm
-from scipy.stats import binom
 from functools import reduce
 
 # Constants/Parameters
