@@ -17,16 +17,20 @@ def ploting(distx1, dists1, hint, sec):
     # hint = nd-equation ([INT],[(INT,float)])
     # sec = nd-point [s1,s2, ... ,sn]
 
+    # Enlarge distx1 to the size of dists1 for proper joint pmf
+    nextx1 = [0.0]*len(dists1)
+    for j in range(len(distx1)):
+        nextx1[(((len(dists1)-1)//2)-ETA + j)] = distx1[j]
+
     # Process the two distributions/create joint probability mass function
-    joint_pmf = np.outer(distx1, dists1)
+    joint_pmf = np.outer(nextx1, dists1)
 
     # For one hint plot the lines for different b with their prob.
     xlat = np.linspace(-ETA, ETA)
     (s, t) = hint
     mar = 0
     for i in t:
-        # a = (i[0]/s[1]) - (s[0]/s[1])*xlat
-        # New due to projection
+        # Projection of the hint to s1
         a = i[0] - s[0]*xlat
         plt.plot(xlat, a, color='red', alpha=i[1])
         # Compute the length of the axes of the plot
@@ -46,7 +50,7 @@ def ploting(distx1, dists1, hint, sec):
         alpha=0.7
     )
 
-    # Project the secret in 2D (generic?)
+    # Project the secret to s1
     secp = sum(vi*xi for vi, xi in zip(hint[0][1:], sec[1:]))
     # Plot secret
     plt.plot(sec[0], secp, 'bo', markersize=5, label="sec")
@@ -77,6 +81,19 @@ def convolution(dist1, dist2):
     return distconv
 
 
+def scalarmultterm(scal, dist):
+    # Perform scalar mult. on pmfs
+    if scal == 0:
+        return []
+    result = [0.0] * (5+4*(np.abs(scal)-1))
+    for i in range(len(dist)):
+        result[i*(np.abs(scal))] = dist[i]
+    if scal < 0:
+        return list(reversed(result))
+    else:
+        return result
+
+
 def main():
     # Create distx1
     distx1 = [0.0625, 0.25, 0.375, 0.25, 0.0625]
@@ -84,6 +101,8 @@ def main():
     distx2 = [0.0625, 0.25, 0.375, 0.25, 0.0625]
     # Create distx3
     distx3 = [0.0625, 0.25, 0.375, 0.25, 0.0625]
+    # Create distx4
+    distx4 = [0.0625, 0.25, 0.375, 0.25, 0.0625]
     # Create sec
     sec = [1, -1, -1]
     # Create hint
@@ -96,15 +115,14 @@ def main():
     # Create hint
     hint = (eq, hintDist)
 
-    # Compute convolution S1 = x2 + x3 (generic?)
-    # s1 = convolution(distx2, distx3)
-
-    # Compute convolutions of arbitrary many distributions
-    dists = [distx1, distx2, distx3]
-    s1 = reduce(convolution, dists)
+    # Compute s1 = linear comb. of pmfs (e.g. 1X2 - 2X3 + 3X4)
+    dists = [distx2, distx3]
+    scalmultterms = [b for b in [scalarmultterm(x, b)
+                                 for (x, b) in zip(eq, dists)] if b]
+    s1conv = reduce(convolution, scalmultterms)
 
     # Plot graph and save it
-    plots = ploting(distx1, s1, hint, sec)
+    plots = ploting(distx1, s1conv, hint, sec)
     plots.savefig('GeoAppBPsolver.png', dpi=300, bbox_inches='tight')
     plots.show()
 
