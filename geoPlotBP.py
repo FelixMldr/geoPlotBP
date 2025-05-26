@@ -21,7 +21,8 @@ def ploting(distx1, dists1, hint, sec):
         nextx1[(((len(dists1)-1)//2)-ETA + j)] = distx1[j]
 
     # Process the two distributions/create joint probability mass function
-    joint_pmf = np.outer(nextx1, dists1)
+    # P(X1=x1, S1=s1) = P(X1=x1) * P(S1=s1)
+    joint_pmf = np.outer(dists1, nextx1)
 
     # For one hint plot the lines for different b with their prob.
     xlat = np.linspace(-ETA, ETA)
@@ -102,18 +103,18 @@ def main():
     # Create distx4
     distx4 = [0.0625, 0.25, 0.375, 0.25, 0.0625]
     # Create sec
-    sec = [1, -1, -1]
+    sec = [1, 1, -1]
     # Create hint
     eq = [1, 1, 1]
 
     # Compute b
     b = sum(vi*wi for vi, wi in zip(eq, sec))
     # Create hintDist
-    hintDist = [(b, 0.8), (b-1, 0.2)]
+    hintDist = [(b, 0.8), (b+1, 0.2)]
     # Create hint
     hint = (eq, hintDist)
 
-    # Compute s1 = linear comb. of pmfs (e.g. 1X2 - 2X3 + 3X4)
+    # Compute s1 = linear comb. of pmfs (e.g. by eq: 1X2 - 2X3 + 3X4)
     dists = [distx2, distx3]
     scalmultterms = [b for b in [scalarmultterm(x, b)
                                  for (x, b) in zip(eq, dists)] if b]
